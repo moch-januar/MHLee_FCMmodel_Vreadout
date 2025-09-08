@@ -108,11 +108,11 @@ $$
 
 | Concept        | Equation                                                                 | Code |
 |----------------|--------------------------------------------------------------------------|------|
-| Jump           | $V_{0k}=\frac{C_k}{C_{\text{REF}}}V_R$                                   | `Vo0k = (C(k)/Cref) * VR;` |
-| Finite settle  | $\text{shape}(t)=(1-e^{-(t-t_0)/t_{\text{set}}})\,u(t-t_0)$              | `shape = (1-exp(-(t - t0)/t_set)).*u(t - t0);` |
+| Jump           | $V_{0k} = \frac{C_k}{C_{\text{REF}}} V_R$                                | `Vo0k = (C(k)/Cref) * VR;` |
+| Finite settle  | $\text{shape}(t) = (1 - e^{-(t-t_0)/t_{\text{set}}})\,u(t-t_0)$          | `shape = (1-exp(-(t - t0)/t_set)).*u(t - t0);` |
 | Linear bleed   | $\text{dec}_{\text{lin}} = -\frac{I_{\text{bleed}}}{C_{\text{REF}}}(t-t_0)\,u(t-t_0)$ | `dec_lin = -(Ibleed/Cref) * (t - t0) .* u(t - t0);` |
-| $R_L$ leakage  | $\text{dec}_{RC,k}=V_{0k}\left(e^{-\frac{t-t_0}{\tau_{RC}}}-1\right)u(t-t_0)$ | `dec_rc_k = Vo0k * (exp(-(t - t0)/tauRC) - 1) .* u(t - t0);` |
-| Total          | $V_o^{(k)}=V_{0k}\,\text{shape}+\text{dec}_{\text{lin}}+\text{dec}_{RC,k}$ | `Vo(k,:) = max(VoJk + dec_lin + dec_rc_k, 0);` |
+| $R_L$ leakage  | $\text{dec}_{RC,k} = V_{0k}\left(e^{-\frac{t-t_0}{\tau_{RC}}} - 1\right)u(t-t_0)$ | `dec_rc_k = Vo0k * (exp(-(t - t0)/tauRC) - 1) .* u(t - t0);` |
+| Total          | $V_o^{(k)} = V_{0k}\,\text{shape} + \text{dec}_{\text{lin}} + \text{dec}_{RC,k}$ | `Vo(k,:) = max(VoJk + dec_lin + dec_rc_k, 0);` |
 
 ---
 
