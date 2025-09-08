@@ -1,196 +1,152 @@
 
 # FCM Readout: From Circuit Concept to Complete Voltage Expression
 
-This repository provides a MATLAB implementation of a **multi‑level ferroelectric capacitive memory (FCM)** readout driven by a **charge‑amplifier topology** with feedback capacitor \(C_{\mathrm{REF}}\), an *optional* parallel resistor \(R_L\), and a small constant bleed current \(I_{\mathrm{bleed}}\). Each memory state \(k\) is represented by a capacitor \(C_k\). The read sequence is:
+This repository provides a MATLAB implementation of a **multi‑level ferroelectric capacitive memory (FCM)** readout driven by a **charge‑amplifier topology** with feedback capacitor $C_{\rm REF}$, an *optional* parallel resistor $R_L$, and a small constant bleed current $I_{\rm bleed}$. Each memory state $k$ is represented by a capacitor $C_k$. The read sequence is:
 
-1) **Pre‑charge** the cell to \(V_R\);\
-2) **Connect** the cell at time \(t_0\), producing an instantaneous “jump” at the output due to charge sharing; \
-3) **Discharge** the output under the action of \(I_{\mathrm{bleed}}\) and (optionally) \(R_L\);\
-4) **Sample** at \(t_{\mathrm{read}}\) and place decision thresholds.
-
-> The code includes both the *engineering* superposition used for plotting and the *exact* closed‑form when \(R_L\) and \(I_{\mathrm{bleed}}\) are both active.
+1) **Pre‑charge** the cell to $V_R$  
+2) **Connect** the cell at time $t_0$, producing an instantaneous “jump” at the output due to charge sharing  
+3) **Discharge** the output under the action of $I_{\rm bleed}$ and (optionally) $R_L$  
+4) **Sample** at $t_{\rm read}$ and place decision thresholds
 
 ---
 
 ## 1) Circuit & Assumptions
 
-**Topology (conceptual).** The non‑inverting op‑amp input is grounded (\(V_+=0\)), so the inverting node is held near 0 V (**virtual ground**). Feedback is provided by \(C_{\mathrm{REF}}\) with an optional \(R_L\) in parallel from \(V_o\) to the inverting node. During read, the FCM state capacitor \(C_k\) is switched to the inverting node. A small, nearly constant \(I_{\mathrm{bleed}}\) injects/sinks current to produce a linear ramp component.
+**Topology (conceptual).** The non‑inverting op‑amp input is grounded ($V_+=0$), so the inverting node is held near 0 V (**virtual ground**). Feedback is provided by $C_{\rm REF}$ with an optional $R_L$ in parallel from $V_o$ to the inverting node. During read, the FCM state capacitor $C_k$ is switched to the inverting node. A small, nearly constant $I_{\rm bleed}$ injects/sinks current to produce a linear ramp component.
 
-**Idealizations.**
-- Ideal op‑amp (infinite gain, zero input current) \(\Rightarrow\) KCL at the inverting node, node voltage \(\approx 0\) V.
-- Unit step \(u(x)=1\) for \(x\ge 0\), else \(0\), marks event onsets.
-- A small front‑end settling time \(t_{\mathrm{set}}\) models finite jump settling in the plot.
+**Idealizations.**  
+- Ideal op‑amp (infinite gain, zero input current) $\Rightarrow$ KCL at the inverting node, node voltage $\approx 0$ V  
+- Unit step $u(x)=1$ for $x\ge 0$, else $0$, marks event onsets  
+- A small front‑end settling time $t_{\rm set}$ models finite jump settling
 
 ---
 
 ## 2) Pre‑Charge: Initial Conditions
 
-For \(t_{\mathrm{pre}}\le t \le t_0\), the cell is driven to \(V_R\) while the inverting node is at virtual ground. Just before connection:
-\[
-Q_k^- = C_k V_R, \qquad V_o^- = 0 \;\Rightarrow\; Q_{\mathrm{REF}}^- = 0.
-\]
+For $t_{\rm pre}\le t \le t_0$, the cell is driven to $V_R$ while the inverting node is at virtual ground. Just before connection:
+
+$$
+Q_k^- = C_k V_R, \qquad V_o^- = 0 \;\Rightarrow\; Q_{\rm REF}^- = 0.
+$$
 
 ---
 
-## 3) Instant of Connection (\(t=t_0\)): Output “Jump”
+## 3) Instant of Connection ($t=t_0$): Output “Jump”
 
 Enforcing charge conservation at the inverting node (held at 0 V) gives the post‑switch output:
-\[
-\boxed{V_{0k} \equiv V_o^+ = \frac{C_k}{C_{\mathrm{REF}}}\,V_R.}
-\]
+
+$$
+\boxed{V_{0k} \equiv V_o^+ = \frac{C_k}{C_{\rm REF}}\,V_R}
+$$
+
 To emulate finite front‑end settling in the figure, we multiply by
-\[
-\text{shape}(t) = \big(1-e^{-(t-t_0)/t_{\mathrm{set}}}\big)\,u(t-t_0).
-\]
+
+$$
+\mathrm{shape}(t) = \big(1-e^{-(t-t_0)/t_{\rm set}}\big)\,u(t-t_0).
+$$
 
 ---
 
-## 4) Post‑Connection Dynamics (KCL at the Inverting Node)
+## 4) Post‑Connection Dynamics
 
-For \(t>t_0\), the cell current is ~0 (no further drive), and KCL reads:
-\[
-C_{\mathrm{REF}}\,\frac{dV_o}{dt} + \frac{V_o}{R_L} + I_{\mathrm{bleed}} = 0, \qquad
-\tau_{RC}=R_L C_{\mathrm{REF}}.
-\]
+For $t>t_0$, the cell current is $\approx 0$, and KCL at the inverting node reads:
 
-### Special Case A — *Pure Bleed* (\(R_L=\infty\))
-\[
-V_o(t)=V_{0k} - \frac{I_{\mathrm{bleed}}}{C_{\mathrm{REF}}}\,(t-t_0), \quad t\ge t_0.
-\]
-We implement this as
-\[
-\text{dec}_{\mathrm{lin}}(t)= -\frac{I_{\mathrm{bleed}}}{C_{\mathrm{REF}}}(t-t_0)\,u(t-t_0).
-\]
+$$
+C_{\rm REF}\,\frac{dV_o}{dt} + \frac{V_o}{R_L} + I_{\rm bleed} = 0, \qquad
+\tau_{RC}=R_L C_{\rm REF}.
+$$
 
-### Special Case B — *Pure \(R_L\)* (\(I_{\mathrm{bleed}}=0\))
-\[
-V_o(t)= V_{0k}\,e^{-(t-t_0)/\tau_{RC}},\quad
-\text{or}\quad \text{dec}_{RC,k}(t) = V_{0k}\big(e^{-(t-t_0)/\tau_{RC}}-1\big)\,u(t-t_0).
-\]
+### Case A — Pure Bleed ($R_L=\infty$)
 
-### General Case — *Exact Closed‑Form* (\(R_L<\infty\), \(I_{\mathrm{bleed}}\ne 0\))
-\[
-\boxed{V_o^{\mathrm{exact}}(t)= \big(V_{0k}+I_{\mathrm{bleed}}R_L\big)\,e^{-\frac{t-t_0}{\tau_{RC}}} - I_{\mathrm{bleed}}R_L, \quad t\ge t_0.}
-\]
+$$
+V_o(t)=V_{0k} - \frac{I_{\rm bleed}}{C_{\rm REF}}\,(t-t_0)
+$$
 
-> The plotting path in the script uses the superposition of the step, linear term, and exponential term for clarity; the exact form above is also available/supported if you prefer a single expression.
+### Case B — Pure $R_L$ ($I_{\rm bleed}=0$)
+
+$$
+V_o(t)= V_{0k}\,e^{-(t-t_0)/\tau_{RC}}
+$$
+
+### General Case — Exact Solution
+
+$$
+\boxed{V_o^{\rm exact}(t)= \big(V_{0k}+I_{\rm bleed}R_L\big)\,e^{-\frac{t-t_0}{\tau_{RC}}} - I_{\rm bleed}R_L}
+$$
 
 ---
 
-## 5) Complete Readout Expression (Coded Superposition)
+## 5) Superposition Implementation
 
-For plotting, the time‑domain response used in the code is
-\[
-\boxed{V_o^{(k)}(t)= V_{0k}\,\text{shape}(t) + \text{dec}_{\mathrm{lin}}(t) + \text{dec}_{RC,k}(t).}
-\]
-This is exact in the limiting cases \(R_L=\infty\) (pure linear) and \(I_{\mathrm{bleed}}=0\) (pure exponential), and a good engineering approximation otherwise. For a mathematically exact response with both effects together, use \(V_o^{\mathrm{exact}}(t)\) above (optionally preceded by the finite‑settle shape). In plots, negative values may be clipped to 0 V.
+The code assembles the waveform as
 
----
+$$
+V_o^{(k)}(t)= V_{0k}\,\mathrm{shape}(t) + \mathrm{dec}_{\rm lin}(t) + \mathrm{dec}_{RC,k}(t)
+$$
 
-## 6) Voltage Read‑Out and Thresholds
-
-Choose a read time \(t_{\mathrm{read}}\) after the jump settles (\(\gtrsim 3t_{\mathrm{set}}\)) and before excessive discharge. The per‑state sample is
-\[
-v_{\mathrm{read}}^{(k)} = V_o^{(k)}(t_{\mathrm{read}}).
-\]
-Sort \(\{v_{\mathrm{read}}^{(k)}\}\) in descending order \(v_{(1)}\ge v_{(2)}\ge\cdots\) and place decision thresholds at midpoints:
-\[
-T_i = \frac{v_{(i)}+v_{(i+1)}}{2}.
-\]
-A practical margin metric is \(\min_i\big(v_{(i)}-v_{(i+1)}\big)\); you can sweep \(C_{\mathrm{REF}}\) to maximize it.
+This matches the limits: pure linear ($R_L=\infty$) and pure exponential ($I_{\rm bleed}=0$).
 
 ---
 
-## 7) Concept → Equation → Code Mapping
+## 6) Readout and Thresholds
+
+At chosen $t_{\rm read}$:
+
+$$
+v_{\rm read}^{(k)} = V_o^{(k)}(t_{\rm read})
+$$
+
+Decision thresholds:
+
+$$
+T_i = \frac{v_{(i)}+v_{(i+1)}}{2}
+$$
+
+---
+
+## 7) Code Mapping
 
 | Concept | Equation | Code |
 |---|---|---|
-| Jump (charge redistribution) | \(V_{0k}=\dfrac{C_k}{C_{\mathrm{REF}}}V_R\) | `Vo0k = (C(k)/Cref) * VR;` |
-| Finite settle of jump | \(\text{shape}(t)=(1-e^{-(t-t_0)/t_{\mathrm{set}}})\,u(t-t_0)\) | `shape = (1-exp(-(t - t0)/t_set)).*u(t - t0);` |
-| Linear bleed | \(\text{dec}_{\mathrm{lin}}= -\dfrac{I_{\mathrm{bleed}}}{C_{\mathrm{REF}}}(t-t_0)\,u(t-t_0)\) | `dec_lin = -(Ibleed/Cref) * (t - t0) .* u(t - t0);` |
-| \(R_L\) leakage (offset form) | \(\text{dec}_{RC,k}=V_{0k}(e^{-\frac{t-t_0}{\tau_{RC}}}-1)\,u(t-t_0)\) | `dec_rc_k = Vo0k * (exp(-(t - t0)/tauRC) - 1) .* u(t - t0);` |
-| Coded total (superposition) | \(V_o^{(k)}=V_{0k}\,\text{shape}+\text{dec}_{\mathrm{lin}}+\text{dec}_{RC,k}\) | `Vo(k,:) = max(VoJk + dec_lin + dec_rc_k, 0);` |
+| Jump | $V_{0k}=\tfrac{C_k}{C_{\rm REF}}V_R$ | `Vo0k = (C(k)/Cref) * VR;` |
+| Finite settle | $\mathrm{shape}(t)=(1-e^{-(t-t_0)/t_{\rm set}})\,u(t-t_0)$ | `shape = (1-exp(-(t - t0)/t_set)).*u(t - t0);` |
+| Linear bleed | $\mathrm{dec}_{\rm lin}= -\tfrac{I_{\rm bleed}}{C_{\rm REF}}(t-t_0)\,u(t-t_0)$ | `dec_lin = -(Ibleed/Cref) * (t - t0) .* u;` |
+| $R_L$ leakage | $\mathrm{dec}_{RC,k}=V_{0k}(e^{-(t-t_0)/\tau_{RC}}-1)u(t-t_0)$ | `dec_rc_k = Vo0k * (exp(-(t - t0)/tauRC) - 1) .* u(t - t0);` |
+| Total | $V_o^{(k)}=V_{0k}\,\mathrm{shape}+\mathrm{dec}_{\rm lin}+\mathrm{dec}_{RC,k}$ | `Vo(k,:) = max(VoJk + dec_lin + dec_rc_k, 0);` |
 
 ---
 
-## 8) Global Parameters (Two Example Setups)
+## 8) Parameters
 
-| Parameter | Literature (NUS) | Our Data |
+| Parameter | NUS (literature) | Our Data |
 |---|---:|---:|
-| Device area \(A\) (cm²) | \(2.2\times 10^{-5}\) | \(2.1\times 10^{-4}\) |
-| \(C_{\mathrm{ref}}\) (pF) | 10 | 12 |
-| \(R_L\) (Ω) | \(\infty\) | \(\infty\) |
-| \(I_{\mathrm{bleed}}\) (nA) | 18 | 10 |
-| \(t_{\text{end}}\) (ms) | 0.70 | 2750 |
-| \(dt\) (µs) | 0.5 | 0.5 |
-| Amplitude factor \(\eta\) (–) | 1.0 | 0.16 |
-| \(V_R\) (V) | 0.5 | 0.5 |
-| \(t_{\text{pre}}\) (ms) | 0.01 | 0.01 |
-| \(t_0\) (ms) | 0.12 | 0.12 |
-| \(t_{\text{set}}\) (µs) | 8 | 8 |
-
-> **Note.** \(\eta\) captures non‑ideal charge transfer (parasitics, incomplete pre‑charge, finite GBW, etc.).
-
-Per‑state values with columns ordered **Density → \(C_k\)**:
-
-| Label | Capacitance Density (µF/cm²) — NUS | \(C_k\) (pF) — NUS | Capacitance Density (µF/cm²) — Our Data | \(C_k\) (pF) — Our Data |
-|:--:|--:|--:|--:|--:|
-| 00 | 0.02 | 0.44 | 0.157 | 33 |
-| 01 | 0.30 | 6.60 | 0.505 | 106 |
-| 10 | 0.68 | 14.96 | 1.000 | 210 |
-| 11 | 1.00 | 22.00 | 1.505 | 316 |
+| Device area $A$ (cm²) | $2.2\times10^{-5}$ | $2.1\times10^{-4}$ |
+| $C_{\rm ref}$ (pF) | 10 | 12 |
+| $R_L$ (Ω) | $\infty$ | $\infty$ |
+| $I_{\rm bleed}$ (nA) | 18 | 10 |
+| $t_{\rm end}$ (ms) | 0.70 | 2750 |
+| $dt$ (µs) | 0.5 | 0.5 |
+| $\eta$ (–) | 1.0 | 0.16 |
+| $V_R$ (V) | 0.5 | 0.5 |
+| $t_0$ (ms) | 0.12 | 0.12 |
 
 ---
 
-## 9) Quick Start (Code)
+## 9) Quick Start
 
-Edit the following **key parameters** near the top of `fcm_readout_multilevel_rc.m`:
+Edit top of script:
 
-- `Cdens_uFcm2` — target capacitance densities (µF/cm²) *or* provide measured absolute `Ck` (variant).
-- `A_um2` — device area (µm²).\
-- `Cref`, `RL` — reference capacitor and optional parallel resistor. \
-  • Seconds‑long tails require \(\tau=R_L C_{\mathrm{REF}}\sim 0.1\text{–}1\) s; e.g., `Cref=10e-12` and `RL=100e6` → \(\tau=1\) s. \
-  • Set `RL=inf` for pure linear discharge.
-- `Ibleed` — bleed/leak current (A).\
-- `t_end`, `dt` — total time and step; use seconds to match experiments.
-
-Run the script to get:
-- Pre‑charge pulse \(V_R(t)\)
-- Output \(V_o(t)\) for each state
-- Read markers at \(t_{\mathrm{read}}\) and suggested decision thresholds
-
----
-
-## 10) Interpretation & Design Knobs
-
-- **Jump height** \(\propto \eta\,C_k/C_{\mathrm{REF}}\).
-- **Linear slope** \(\propto I_{\mathrm{bleed}}/C_{\mathrm{REF}}\).
-- **Exponential tail** time‑constant \(\tau=R_L C_{\mathrm{REF}}\); asymptote \(V_\infty=-I_{\mathrm{bleed}}R_L\) (often clipped at 0 V in plots).
-- **Level margin** at \(t_{\mathrm{read}}\): sweep \(C_{\mathrm{REF}}\) and \(t_{\mathrm{read}}\) to maximize \(\min_i(v_{(i)}-v_{(i+1)})\).
-
----
-
-## 11) Files
-
-```
-.
-├── README.md                  # This file
-└── fcm_readout_multilevel_rc.m
+```matlab
+Cref = 10e-12;     % F
+RL   = 100e6;      % Ohm
+Ibleed = 18e-9;    % A
+t_end = 2.0;       % s
 ```
 
----
-
-## 12) Citation
-
-If you use this simulator, please cite:
-
-```
-Liu Group, “FCM Readout: From Circuit Concept to Complete Voltage Expression,”
-GitHub repository, 2025. https://github.com/<your-org>/<your-repo>
-```
+Then run: see pre‑charge, jumps, discharge, thresholds.
 
 ---
 
-## 13) License
+## License
 
-MIT License — see `LICENSE`.
+MIT License — see LICENSE.
