@@ -36,13 +36,13 @@ $$
 Enforcing charge conservation at the inverting node (held at 0 V) gives the post‑switch output:
 
 $$
-\boxed{V_{0k} \equiv V_o^+ = \frac{C_k}{C_{\rm REF}}\,V_R}
+\boxed{V_{0k} \equiv V_o^+ = \frac{C_k}{C_{\rm REF}}\.V_R}
 $$
 
 To emulate finite front‑end settling in the figure, we multiply by
 
 $$
-\mathrm{shape}(t) = \big(1-e^{-(t-t_0)/t_{\rm set}}\big)\,u(t-t_0).
+\mathrm{shape}(t) = \big(1-e^{-(t-t_0)/t_{\rm set}}\big)\.u(t-t_0).
 $$
 
 ---
@@ -52,7 +52,7 @@ $$
 For $t>t_0$, the cell current is $\approx 0$, and KCL at the inverting node reads:
 
 $$
-C_{\rm REF}\,\frac{dV_o}{dt} + \frac{V_o}{R_L} + I_{\rm bleed} = 0, \qquad
+C_{\rm REF}\.\frac{dV_o}{dt} + \frac{V_o}{R_L} + I_{\rm bleed} = 0, \qquad
 \tau_{RC}=R_L C_{\rm REF}.
 $$
 
@@ -71,7 +71,7 @@ $$
 ### General Case — Exact Solution
 
 $$
-\boxed{V_o^{\rm exact}(t)= \big(V_{0k}+I_{\rm bleed}R_L\big)\,e^{-\frac{t-t_0}{\tau_{RC}}} - I_{\rm bleed}R_L}
+\boxed{V_o^{\rm exact}(t)= \big(V_{0k}+I_{\rm bleed}R_L\big)\.e^{-\frac{t-t_0}{\tau_{RC}}} - I_{\rm bleed}R_L}
 $$
 
 ---
@@ -81,7 +81,7 @@ $$
 The code assembles the waveform as
 
 $$
-V_o^{(k)}(t)= V_{0k}\,\mathrm{shape}(t) + \mathrm{dec}_{\rm lin}(t) + \mathrm{dec}_{RC,k}(t)
+V_o^{(k)}(t)= V_{0k}\.\mathrm{shape}(t) + \mathrm{dec}_{\rm lin}(t) + \mathrm{dec}_{RC,k}(t)
 $$
 
 This matches the limits: pure linear ($R_L=\infty$) and pure exponential ($I_{\rm bleed}=0$).
@@ -108,10 +108,10 @@ $$
 
 | Parameter | NUS (literature) | Our Data |
 |---|---:|---:|
-| Device area $A$ (cm²) | $2.2\times10^{-5}$ | $2.1\times10^{-4}$ |
+| Device area $A$ (cm²) | $2.2\times10^{-5}$ | $2.1\times10^{-3}$ |
 | $C_{\rm ref}$ (pF) | 10 | 12 |
 | $R_L$ (Ω) | $\infty$ | $\infty$ |
-| $I_{\rm bleed}$ (nA) | 18 | 10 |
+| $I_{\rm bleed}$ (nA) | 18 | 0.02 |
 | $t_{\rm end}$ (ms) | 0.70 | 2750 |
 | $dt$ (µs) | 0.5 | 0.5 |
 | $\eta$ (–) | 1.0 | 0.16 |
@@ -125,10 +125,10 @@ $$
 Edit top of script:
 
 ```matlab
-Cref = 10e-12;     % F
-RL   = 100e6;      % Ohm
-Ibleed = 18e-9;    % A
-t_end = 2.0;       % s
+Cref   = 12e-9;    % F
+RL     = inf;      % Ohm
+Ibleed = 1.9e-11;  % A
+t_end  = 2.0;      % s
 ```
 
 Then run: see pre‑charge, jumps, discharge, thresholds.
