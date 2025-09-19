@@ -1,4 +1,4 @@
-function Vo = fcm_simulate_states(cfg, t, C, Cref, VR, t0, shape, dec_lin, tauRC, u)
+function Vo = fcm_simulate_states(cfg, t, C, Cref, VR, t0, shape, dec_lin, tauRC, u, G)
 %% For each state capacitance C(k), compute Vo(t)
    N  = numel(C);
    Vo = zeros(N, numel(t));
@@ -13,6 +13,6 @@ function Vo = fcm_simulate_states(cfg, t, C, Cref, VR, t0, shape, dec_lin, tauRC
        else
            dec_rc_k = 0;
        end
-       Vo(k,:) = max(VoJk + dec_lin + dec_rc_k, 0); % clip at 0 for display
+       Vo(k,:) = G*max(VoJk + dec_lin + dec_rc_k, 0); % clip at 0 for display
    end
 end
