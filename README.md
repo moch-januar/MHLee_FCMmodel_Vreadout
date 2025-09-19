@@ -65,7 +65,7 @@ $$
 ### Case B — Pure $R_L$ ($I_{\rm bleed}=0$)
 
 $$
-V_o(t)= V_{0k}\,e^{-(t-t_0)/\tau_{RC}}
+V_o(t)= V_{0k}\.e^{-(t-t_0)/\tau_{RC}}
 $$
 
 ### General Case — Exact Solution
@@ -109,7 +109,7 @@ $$
 | Parameter | NUS (literature) | Our Data |
 |---|---:|---:|
 | Device area $A$ (cm²) | $2.2\times10^{-5}$ | $2.1\times10^{-3}$ |
-| $C_{\rm ref}$ (pF) | 10 | 12 |
+| $C_{\rm ref}$ (pF) | 10 | 12000 |
 | $R_L$ (Ω) | $\infty$ | $\infty$ |
 | $I_{\rm bleed}$ (nA) | 18 | 0.02 |
 | $t_{\rm end}$ (ms) | 0.70 | 2750 |
